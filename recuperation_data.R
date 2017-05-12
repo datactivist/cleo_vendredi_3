@@ -100,3 +100,21 @@ regex_hypo <- rex(
 urls_hypoAgrege <- bind_cols(urls_hypoAgrege, re_matches(urls_hypoAgrege$url, regex_hypo))
 save(urls_hypoAgrege, file = "../data/frequentation/hypoAgrege20170101-20170420.Rdata")
 write_csv(urls_hypoAgrege, path = "../data/frequentation/hypoAgrege20170101-20170420.csv")
+
+## Calenda
+
+urls_calendaAgrege <- getPageUrls(idSite = 6, date = paste0(ymd("20170101"), ",", ymd("20170420")), period = "range")
+
+regex_calenda <- rex(
+  group("http", maybe("s"), "://"),
+  "calenda.org",
+  maybe("/",
+        capture(
+          name = "evenement",
+          one_or_more(numbers))
+  )
+)
+
+urls_calendaAgrege <- bind_cols(urls_calendaAgrege, re_matches(urls_calendaAgrege$url, regex_calenda))
+save(urls_calendaAgrege, file = "../data/frequentation/calendaAgrege20170101-20170420.Rdata")
+write_csv(urls_calendaAgrege, path = "../data/frequentation/calendaAgrege20170101-20170420.csv")
