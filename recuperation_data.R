@@ -27,10 +27,76 @@ write_csv(urls_books, path = "../data/frequentation/books20170101-20170131.csv")
 # ensuite éventuellement utiliser visitsSegmented pour récupérer url par url
 
 
-urls_journalsAgrege <- getPageUrls(idSite = 3, date = paste0(ymd("20170101"), ",", ymd("20170430")), period = "range")
+urls_journalsAgrege <- getPageUrls(idSite = 3, date = paste0(ymd("20170101"), ",", ymd("20170420")), period = "range")
+
+urls_booksAgrege <- getPageUrls(idSite = 5, date = paste0(ymd("20170101"), ",", ymd("20170420")), period = "range")
+
+
+## parser les urls ?
+
+library(rex)
+
+rex_mode()
+
+valid_chars <- rex(except_some_of(".", "/", " ", "-"))
+
+
+regex_journal <- rex(
+  group("http", maybe("s"), "://"),
+  capture(name = "revue",
+          zero_or_more(valid_chars, zero_or_more("-"))
+          ),
+  maybe("."),
+  "revues.org",
+  maybe("/",
+  capture(
+    name = "article",
+    one_or_more(numbers))
+  )
+)
+
+urls_journalsAgrege <- bind_cols(urls_journalsAgrege, re_matches(urls_journalsAgrege$url, regex_journal))
+
 save(urls_journalsAgrege, file = "../data/frequentation/journalsAgrege20170101-20170430.Rdata")
 write_csv(urls_journalsAgrege, path = "../data/frequentation/journalsAgrege20170101-20170430.csv")
 
-urls_booksAgrege <- getPageUrls(idSite = 3, date = paste0(ymd("20170101"), ",", ymd("20170430")), period = "range")
-save(urls_booksAgrege, file = "../data/frequentation/booksAgrege20170101-20170430.Rdata")
-write_csv(urls_booksAgrege, path = "../data/frequentation/booksAgrege20170101-20170430.csv")
+regex_books <- rex(
+  group("http", maybe("s"), "://"),
+  "books.openedition.org",
+  maybe(
+    "/",
+    capture(name = "collection",
+            zero_or_more(valid_chars, zero_or_more("-"))
+    )),
+    maybe("/",    
+    capture(name = "livre",
+            numbers
+    )
+    )
+)
+
+urls_booksAgrege <- bind_cols(urls_booksAgrege, re_matches(urls_booksAgrege$url, regex_books))
+save(urls_booksAgrege, file = "../data/frequentation/booksAgrege20170101-20170420.Rdata")
+write_csv(urls_booksAgrege, path = "../data/frequentation/booksAgrege20170101-20170420.csv")
+
+## hypothèses
+
+urls_hypoAgrege <- getPageUrls(idSite = 4, date = paste0(ymd("20170101"), ",", ymd("20170420")), period = "range")
+
+regex_hypo <- rex(
+  group("http", maybe("s"), "://"),
+  capture(name = "carnet",
+          zero_or_more(valid_chars, zero_or_more("-"))
+  ),
+  maybe("."),
+  "hypotheses.org",
+  maybe("/",
+        capture(
+          name = "billet",
+          one_or_more(numbers))
+  )
+)
+
+urls_hypoAgrege <- bind_cols(urls_hypoAgrege, re_matches(urls_hypoAgrege$url, regex_hypo))
+save(urls_hypoAgrege, file = "../data/frequentation/hypoAgrege20170101-20170420.Rdata")
+write_csv(urls_hypoAgrege, path = "../data/frequentation/hypoAgrege20170101-20170420.csv")
