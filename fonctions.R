@@ -69,23 +69,41 @@ getPageUrls <- function(idSite = 1,
                    flat = 1,
                    filter_limit = -1,
                    format = "json"))
-  content(request) %>% 
-    map_df(~ map_df(., function(x) {
-      tryCatch({
-        data_frame(label = x$label,
-                   url = ifelse(!is.null(x[["url"]]),
-                                x[["url"]],
-                                NA_character_),
-                   nb_visits = x$nb_visits,
-                   entry_nb_visits = ifelse(!is.null(x[["entry_nb_visits"]]),
-                                             as.integer(x[["entry_nb_visits"]]),
-                                             0),
-                   exit_nb_visits = ifelse(!is.null(x[["exit_nb_visits"]]),
-                                           as.integer(x[["exit_nb_visits"]]),
-                                           0))
-      }, error = function(e) e)
+  if (period %in% "range") {
+    content(request) %>% 
+      map_df(., function(x) {
+          data_frame(label = x$label,
+                     url = ifelse(!is.null(x[["url"]]),
+                                  x[["url"]],
+                                  NA_character_),
+                     nb_visits = x$nb_visits,
+                     entry_nb_visits = ifelse(!is.null(x[["entry_nb_visits"]]),
+                                              as.integer(x[["entry_nb_visits"]]),
+                                              0),
+                     exit_nb_visits = ifelse(!is.null(x[["exit_nb_visits"]]),
+                                             as.integer(x[["exit_nb_visits"]]),
+                                             0))
+      })
+  } else {
+    content(request) %>% 
+      map_df(~ map_df(., function(x) {
+        tryCatch({
+          data_frame(label = x$label,
+                     url = ifelse(!is.null(x[["url"]]),
+                                  x[["url"]],
+                                  NA_character_),
+                     nb_visits = x$nb_visits,
+                     entry_nb_visits = ifelse(!is.null(x[["entry_nb_visits"]]),
+                                              as.integer(x[["entry_nb_visits"]]),
+                                              0),
+                     exit_nb_visits = ifelse(!is.null(x[["exit_nb_visits"]]),
+                                             as.integer(x[["exit_nb_visits"]]),
+                                             0))
+        }, error = function(e) e)
       }), .id = "date") %>% 
       mutate(date = lubridate::ymd(date))
+    
+  }
 }
 
 

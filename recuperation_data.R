@@ -25,3 +25,12 @@ write_csv(urls_journals, path = "../data/frequentation/journals20170101-20170302
 save(urls_books, file = "../data/frequentation/books20170101-20170131.Rdata")
 write_csv(urls_books, path = "../data/frequentation/books20170101-20170131.csv")
 # ensuite éventuellement utiliser visitsSegmented pour récupérer url par url
+
+
+urls_journalsAgrege <- getPageUrls(idSite = 3, date = paste0(ymd("20170101"), ",", ymd("20170430")), period = "range")
+save(urls_journalsAgrege, file = "../data/frequentation/journalsAgrege20170101-20170430.Rdata")
+write_csv(urls_journalsAgrege, path = "../data/frequentation/journalsAgrege20170101-20170430.csv")
+
+urls_booksAgrege <- getPageUrls(idSite = 3, date = paste0(ymd("20170101"), ",", ymd("20170430")), period = "range")
+save(urls_booksAgrege, file = "../data/frequentation/booksAgrege20170101-20170430.Rdata")
+write_csv(urls_booksAgrege, path = "../data/frequentation/booksAgrege20170101-20170430.csv")
